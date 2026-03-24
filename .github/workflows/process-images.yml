@@ -123,9 +123,12 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Save processed markdown files to temp
+          # Save processed markdown files and authors to temp
           mkdir -p /tmp/processed
           find posts -name "*.md" -exec cp --parents {} /tmp/processed/ \;
+          if [ -d "authors" ]; then
+            cp -r authors /tmp/processed/
+          fi
           
           # Discard local changes and switch to main
           git checkout -- .
@@ -134,12 +137,16 @@ jobs:
           
           # Copy processed files back
           cp -r /tmp/processed/posts/* posts/
+          if [ -d "/tmp/processed/authors" ]; then
+            cp -r /tmp/processed/authors/* authors/
+          fi
           
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
-          # Only add the markdown files (not images folder)
+          # Add markdown files and authors
           git add posts/**/*.md
+          git add authors/
           git commit -m "Add post: ${{ github.event.pull_request.title }}
 
           - Images uploaded to CDN
