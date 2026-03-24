@@ -226,7 +226,7 @@ def upload_to_cdn(file_path: Path, cdn_key: str) -> bool:
 class ArticleGroup:
     article_id: str
     md_files: list[Path] = field(default_factory=list)
-    images_dir: Path | None = None
+    images_dirs: list[Path] = field(default_factory=list)
     source_md: Path | None = None
 
 
@@ -257,7 +257,8 @@ def group_articles_by_id(md_files: list[Path]) -> dict[str, ArticleGroup]:
         
         images_dir = md_path.parent / IMAGES_FOLDER_NAME
         if images_dir.exists() and images_dir.is_dir():
-            groups[article_id].images_dir = images_dir
+            if images_dir not in groups[article_id].images_dirs:
+                groups[article_id].images_dirs.append(images_dir)
             groups[article_id].source_md = md_path
     
     return groups
@@ -270,7 +271,7 @@ def collect_all_image_references(
     cover_ref: str | None = None
     cover_path: Path | None = None
     
-    if not group.images_dir:
+    if not group.images_dirs:
         return {}, None
     
     for md_path in group.md_files:
@@ -279,11 +280,18 @@ def collect_all_image_references(
         
         fm_cover = frontmatter.get('image', '')
         if fm_cover and not fm_cover.startswith(('http://', 'https://')):
-            potential_cover = (group.images_dir / Path(fm_cover).name).resolve()
-            if not potential_cover.exists():
-                potential_cover = (md_path.parent / fm_cover).resolve()
+            potential_cover = None
+            for images_dir in group.images_dirs:
+                candidate = (images_dir / Path(fm_cover).name).resolve()
+                if candidate.exists():
+                    potential_cover = candidate
+                    break
+            if potential_cover is None:
+                candidate = (md_path.parent / fm_cover).resolve()
+                if candidate.exists():
+                    potential_cover = candidate
             
-            if potential_cover.exists():
+            if potential_cover is not None:
                 is_valid, _ = validate_image_file(potential_cover)
                 if is_valid:
                     cover_path = potential_cover
@@ -299,9 +307,13 @@ def collect_all_image_references(
                 continue
             
             img_filename = Path(img_ref).name
-            resolved = (group.images_dir / img_filename).resolve()
-            
-            if not resolved.exists():
+            resolved = None
+            for images_dir in group.images_dirs:
+                candidate = (images_dir / img_filename).resolve()
+                if candidate.exists():
+                    resolved = candidate
+                    break
+            if resolved is None:
                 resolved = (md_path.parent / img_ref).resolve()
             
             if resolved.exists():
@@ -324,10 +336,10 @@ def process_article_group(group: ArticleGroup) -> ProcessingResult:
     print(f"\n{'='*60}")
     print(f"{mode_label} Processing article group: {group.article_id}")
     print(f"Files in group: {[str(f) for f in group.md_files]}")
-    print(f"Images folder: {group.images_dir or 'none'}")
+    print(f"Images folders: {[str(d) for d in group.images_dirs] or 'none'}")
     print(f"{'='*60}")
     
-    if not group.images_dir:
+    if not group.images_dirs:
         print("No images folder found in any language variant")
         return result
     
@@ -458,19 +470,30 @@ def process_article_group(group: ArticleGroup) -> ProcessingResult:
                         new_content, n = pattern.subn(rf'![\1]({img.cdn_url})', new_content)
                         replacements_made += n
             
+            # Always update image field in frontmatter to CDN cover URL (ID 0)
+            cover_cdn_url = f"{CDN_BASE_URL}/i/posts/{group.article_id}/{group.article_id}-0.webp"
+            new_content = re.sub(
+                r'^image:.*$',
+                f'image: "{cover_cdn_url}"',
+                new_content,
+                count=1,
+                flags=re.MULTILINE,
+            )
+
             if new_content != content:
                 md_path.write_text(new_content, encoding='utf-8')
                 print(f"  [✓] Updated: {md_path} ({replacements_made} replacements)")
             else:
                 print(f"  [·] No changes: {md_path}")
     
-    if group.images_dir and group.images_dir.exists():
-        if DRY_RUN:
-            print(f"\n[DRY-RUN] Would remove images folder: {group.images_dir}")
-        else:
-            print(f"\nRemoving images folder: {group.images_dir}")
-            shutil.rmtree(group.images_dir)
-            print("[✓] Images folder removed")
+    for images_dir in group.images_dirs:
+        if images_dir.exists():
+            if DRY_RUN:
+                print(f"\n[DRY-RUN] Would remove images folder: {images_dir}")
+            else:
+                print(f"\nRemoving images folder: {images_dir}")
+                shutil.rmtree(images_dir)
+                print(f"[✓] Images folder removed: {images_dir}")
     
     print(f"\n{'─'*60}")
     print(f"Summary for {group.article_id}:")

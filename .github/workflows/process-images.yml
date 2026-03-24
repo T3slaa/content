@@ -66,10 +66,18 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Preserve trusted script from main
+        run: |
+          cp .github/scripts/process_images.py /tmp/process_images.py
+
       - name: Fetch PR content
         run: |
           git fetch origin pull/${{ github.event.pull_request.number }}/head:pr-branch
           git checkout pr-branch
+
+      - name: Restore trusted script
+        run: |
+          cp /tmp/process_images.py .github/scripts/process_images.py
 
       - name: Setup Python
         uses: actions/setup-python@v5
