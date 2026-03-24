@@ -4,7 +4,7 @@ title: "eCPPTv3 Review - Certified Professional Penetration Tester 2026"
 author: "mario-ramos-salson"
 publishedDate: 2026-03-24
 updatedDate: 2026-03-24
-image: ""
+image: "https://cdn.deephacking.tech/i/posts/ine-ecpptv3-review/ine-ecpptv3-review-0.webp"
 description: "Review completa de la certificación eCPPTv3 de INE eLearnSecurity: preparación, examen, consejos y si realmente vale la pena"
 categories:
   - "certifications"

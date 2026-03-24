@@ -4,8 +4,8 @@ title: "eCPPTv3 Cheatsheet"
 author: "mario-ramos-salson"
 publishedDate: 2026-03-24
 updatedDate: 2026-03-24
-image: ""
-description: "eLearnSecurity eCPPTv3 cheatsheet"
+image: "https://cdn.deephacking.tech/i/posts/ine-ecpptv3-cheatsheet/ine-ecpptv3-cheatsheet-0.webp"
+description: "Una guía rápida sobre eCPPTv3 que abarca la enumeración de puertos, los ataques a Active Directory, la extracción de hash y las técnicas de fuerza bruta"
 categories:
   - "certifications"
 draft: false
