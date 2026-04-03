@@ -4,7 +4,7 @@ title: "PIPA Review: Practical IoT Pentest Associate 2026"
 author: "gorka-vila-perez"
 publishedDate: 2026-04-07
 updatedDate: 2026-04-07
-image: ""
+image: "https://cdn.deephacking.tech/i/posts/tcm-pipa-review/tcm-pipa-review-0.webp"
 description: "Review of the Practical IoT Pentest Associate (PIPA) certification from TCM Security, covering the exam structure, content, and personal experience."
 categories:
   - "certifications"
