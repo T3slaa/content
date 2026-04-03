@@ -326,6 +326,45 @@ def collect_all_image_references(
     return image_to_mds, cover_ref
 
 
+def _replace_image_field(article_id: str, content: str) -> str:
+    cover_cdn_url = f"{CDN_BASE_URL}/i/posts/{article_id}/{article_id}-0.webp"
+    return re.sub(
+        r'^image:.*$',
+        f'image: "{cover_cdn_url}"',
+        content,
+        count=1,
+        flags=re.MULTILINE,
+    )
+
+
+def _update_cover_url_in_frontmatter(
+    group: ArticleGroup, result: ProcessingResult
+) -> None:
+    cover_cdn_url = f"{CDN_BASE_URL}/i/posts/{group.article_id}/{group.article_id}-0.webp"
+    print(f"\nUpdating image field in frontmatter to: {cover_cdn_url}")
+
+    for md_path in group.md_files:
+        content = md_path.read_text(encoding='utf-8')
+        new_content = _replace_image_field(group.article_id, content)
+
+        if new_content != content:
+            if DRY_RUN:
+                print(f"  [DRY-RUN] Would update image field in: {md_path}")
+            else:
+                md_path.write_text(new_content, encoding='utf-8')
+                print(f"  [✓] Updated image field: {md_path}")
+        else:
+            print(f"  [·] Image field already up to date: {md_path}")
+
+    print(f"\n{'─'*60}")
+    print(f"Summary for {group.article_id}:")
+    print(f"  Files updated: {len(group.md_files)}")
+    print(f"  Unique images: 0")
+    print(f"  Images processed: 0")
+    print(f"  Images uploaded: 0")
+    print(f"{'─'*60}")
+
+
 def process_article_group(group: ArticleGroup) -> ProcessingResult:
     result = ProcessingResult(
         md_path=group.source_md or group.md_files[0],
@@ -341,12 +380,14 @@ def process_article_group(group: ArticleGroup) -> ProcessingResult:
     
     if not group.images_dirs:
         print("No images folder found in any language variant")
+        _update_cover_url_in_frontmatter(group, result)
         return result
     
     image_to_mds, cover_ref = collect_all_image_references(group)
     
     if not image_to_mds:
         print("No valid images found")
+        _update_cover_url_in_frontmatter(group, result)
         return result
     
     cover_path: Path | None = None
@@ -470,15 +511,7 @@ def process_article_group(group: ArticleGroup) -> ProcessingResult:
                         new_content, n = pattern.subn(rf'![\1]({img.cdn_url})', new_content)
                         replacements_made += n
             
-            # Always update image field in frontmatter to CDN cover URL (ID 0)
-            cover_cdn_url = f"{CDN_BASE_URL}/i/posts/{group.article_id}/{group.article_id}-0.webp"
-            new_content = re.sub(
-                r'^image:.*$',
-                f'image: "{cover_cdn_url}"',
-                new_content,
-                count=1,
-                flags=re.MULTILINE,
-            )
+            new_content = _replace_image_field(group.article_id, new_content)
 
             if new_content != content:
                 md_path.write_text(new_content, encoding='utf-8')
