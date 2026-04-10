@@ -1,6 +1,6 @@
 ---
 name: "Gorka Vila Pérez"
-bio: "Ciberseguridad, hardware hacking, IoT pentesting."
+bio: "Cybersecurity, hardware hacking, IoT pentesting."
 github: "https://github.com/gorkavp"
 linkedin: "https://www.linkedin.com/in/gorkavp/"
 lang: "en"

@@ -29,7 +29,9 @@ Gran parte de ese contenido se puede encontrar repartido entre blogs, vídeos y 
 
 El curso completo está disponible en YouTube aquí:
 
-[Beginner's Guide to IoT and Hardware Hacking](https://www.youtube.com/watch?v=j8SqZLr64NA)
+- [Beginner's Guide to IoT and Hardware Hacking](https://www.youtube.com/watch?v=j8SqZLr64NA)
+
+---
 
 - [Electrónica (mi experiencia)](#electrónica-mi-experiencia)
 - [Equipamiento: opcional, pero lo recomiendo](#equipamiento-opcional-pero-lo-recomiendo)

@@ -27,7 +27,9 @@ To prepare you for the exam, they provide a course called **Beginner’s Guide t
 
 You can find most of the topics scattered across blog posts and random tutorials online, but the big advantage here is that everything is **organized in a clean learning path**. It’s easier to follow than hopping between ten different sources. The instructor, Andrew, explains concepts clearly and also gives multiple ways to contact him, which is genuinely helpful if you get stuck. You can take a look at the entire course, which has been published to YouTube, by following the link:
 
-[Beginner's Guide to IoT and Hardware Hacking](https://www.youtube.com/watch?v=j8SqZLr64NA)
+- [Beginner's Guide to IoT and Hardware Hacking](https://www.youtube.com/watch?v=j8SqZLr64NA)
+
+---
 
 - [Electronics (my experience)](#electronics-my-experience)
 - [Equipment: optional, but I'd recommend it](#equipment-optional-but-id-recommend-it)
